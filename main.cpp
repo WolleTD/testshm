@@ -1,7 +1,8 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
-#include "shm.h"
+#include <boost/interprocess/shared_memory_object.hpp>
+#include <boost/interprocess/mapped_region.hpp>
 
 class MyObj {
     uint32_t _val {0};
@@ -15,31 +16,24 @@ public:
 };
 
 int main(int argc, char *argv[]) {
+    using namespace boost::interprocess;
     // No args == "Server"
     if (argc == 1) {
-        auto* shmObj = shm_create<MyObj>();
-
-        if (shmObj == nullptr) {
-            std::cerr << "Failed to create shared object" << std::endl;
-            return 1;
-        }
-        std::cout << "Created shm object" << std::endl;
+        shared_memory_object shm(create_only, "mySHM", read_write);
+        shm.truncate(sizeof(MyObj));
+        mapped_region region(shm, read_write);
+        auto* shmObj = new (region.get_address()) MyObj();
 
         while (shmObj->running()) {
             std::cout << "Shm Val: " << shmObj->val() << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-
-        shm_destroy(shmObj);
         std::cout << "Good bye!";
-
+        shared_memory_object::remove("mySHM");
     } else {
-        auto* shmObj = shm_connect<MyObj>();
-
-        if (shmObj == nullptr) {
-            std::cerr << "Failed to connect to shared memory" << std::endl;
-            return 1;
-        }
+        shared_memory_object shm(open_only, "mySHM", read_write);
+        mapped_region region(shm, read_write);
+        auto* shmObj = (MyObj*)region.get_address();
 
         int x = atoi(argv[1]);
         if (x >= 0) {
@@ -48,8 +42,6 @@ int main(int argc, char *argv[]) {
             // Stop on negative argv[1]
             shmObj->stop();
         }
-
-        shm_free(shmObj);
     }
     return 0;
 }
