@@ -14,7 +14,7 @@
 template <typename T>
 static T* initShm(const std::string& name, bool create) {
     int flags = create ? O_CREAT | O_EXCL | O_RDWR : O_RDWR;
-    int shm_fd = shm_open(name.c_str(), flags, 0700);
+    int shm_fd = shm_open(name.c_str(), flags, 0644);
     if (shm_fd == -1) {
         std::cerr << "Error shm_open " << errno << " (" << strerror(errno)
                   << ")" << std::endl;
