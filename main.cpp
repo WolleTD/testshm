@@ -30,6 +30,7 @@ int main(int argc, char *argv[]) {
         sigemptyset(&sa.sa_mask);
         sa.sa_flags = SA_RESTART;
         sigaction(SIGINT, &sa, nullptr);
+        sigaction(SIGTERM, &sa, nullptr);
 
         auto shmObj = ShmObject<MyObj>(typeid(MyObj).name());
 
