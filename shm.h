@@ -73,7 +73,7 @@ public:
         }
     }
 
-    T* operator()() { return _object; }
+    T& operator()() { return *_object; }
 };
 
 #endif //TESTSHM_SHM_H

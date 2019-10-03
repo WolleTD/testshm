@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
 
         std::cout << "Created shm object" << std::endl;
 
-        while (shmObj()->running() && !quit) {
-            std::cout << "Shm Val: " << shmObj()->val() << std::endl;
+        while (shmObj().running() && !quit) {
+            std::cout << "Shm Val: " << shmObj().val() << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
         std::cout << "Good bye!";
@@ -46,10 +46,10 @@ int main(int argc, char *argv[]) {
 
         int x = atoi(argv[1]);
         if (x >= 0) {
-            shmObj()->val(x);
+            shmObj().val(x);
         } else {
             // Stop on negative argv[1]
-            shmObj()->stop();
+            shmObj().stop();
         }
     }
     return 0;
