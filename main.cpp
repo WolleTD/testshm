@@ -17,39 +17,26 @@ public:
 int main(int argc, char *argv[]) {
     // No args == "Server"
     if (argc == 1) {
-        auto* shmObj = shm_create<MyObj>();
+        auto shmObj = ShmObject<MyObj>(typeid(MyObj).name());
 
-        if (shmObj == nullptr) {
-            std::cerr << "Failed to create shared object" << std::endl;
-            return 1;
-        }
         std::cout << "Created shm object" << std::endl;
 
-        while (shmObj->running()) {
-            std::cout << "Shm Val: " << shmObj->val() << std::endl;
+        while (shmObj()->running()) {
+            std::cout << "Shm Val: " << shmObj()->val() << std::endl;
             std::this_thread::sleep_for(std::chrono::seconds(1));
         }
-
-        shm_destroy(shmObj);
         std::cout << "Good bye!";
 
     } else {
-        auto* shmObj = shm_connect<MyObj>();
-
-        if (shmObj == nullptr) {
-            std::cerr << "Failed to connect to shared memory" << std::endl;
-            return 1;
-        }
+        auto shmObj = ShmObject<MyObj>(typeid(MyObj).name(), ShmObject<MyObj>::attach_rw);
 
         int x = atoi(argv[1]);
         if (x >= 0) {
-            shmObj->val(x);
+            shmObj()->val(x);
         } else {
             // Stop on negative argv[1]
-            shmObj->stop();
+            shmObj()->stop();
         }
-
-        shm_free(shmObj);
     }
     return 0;
 }
