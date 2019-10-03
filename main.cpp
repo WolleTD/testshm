@@ -34,10 +34,15 @@ int main(int argc, char *argv[]) {
         auto shmObj = ShmObject<MyObj>(typeid(MyObj).name());
 
         std::cout << "Created shm object" << std::endl;
+        auto lastTime = std::chrono::steady_clock::now();
 
         while (shmObj().running() && !quit) {
-            std::cout << "Shm Val: " << shmObj().val() << std::endl;
-            std::this_thread::sleep_for(std::chrono::seconds(1));
+            auto thisTime = std::chrono::steady_clock::now();
+            std::cout << "Shm Val: " << shmObj().val() << " time " <<
+                std::chrono::duration_cast<std::chrono::microseconds>(thisTime - lastTime).count() <<
+                "µs" << std::endl;
+            lastTime = thisTime;
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
         }
         std::cout << "Good bye!";
 
