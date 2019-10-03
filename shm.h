@@ -34,19 +34,23 @@ public:
         } else if (flag == attach_rw) {
             flags = O_RDWR;
         }
+
         int shm_fd = shm_open(_name.c_str(), flags, 0644);
         if (shm_fd == -1) {
             std::stringstream ss;
             ss << "Error shm_open " << errno << " (" << strerror(errno) << ")";
             throw std::runtime_error(ss.str());
         }
+
         if (_owner) {
             ftruncate(shm_fd, sizeof(T));
         }
+
         int prot = PROT_READ;
         if (flag != attach_ro) {
             prot |= PROT_WRITE;
         }
+
         void* mptr = mmap(nullptr, sizeof(T), prot, MAP_SHARED, shm_fd, 0);
         if (mptr == (void*)-1) {
             std::stringstream ss;
@@ -56,6 +60,8 @@ public:
             }
             throw std::runtime_error(ss.str());
         }
+        close(shm_fd);
+
         if (_owner) {
             _object = new(mptr) T;
         } else {
