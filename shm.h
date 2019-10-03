@@ -18,7 +18,7 @@ template <typename T>
 class ShmObject {
     std::string _name;
     T* _object;
-    bool _owner;
+    bool _owner{};
 
 public:
     enum shm_flag {
