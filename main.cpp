@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
         std::cout << "Created shm object" << std::endl;
         auto lastTime = std::chrono::steady_clock::now();
 
-        while (shmObj().running() && !quit) {
+        while (shmObj->running() && !quit) {
             auto thisTime = std::chrono::steady_clock::now();
-            std::cout << "Shm Val: " << shmObj().val() << " time " <<
+            std::cout << "Shm Val: " << shmObj->val() << " time " <<
                 std::chrono::duration_cast<std::chrono::microseconds>(thisTime - lastTime).count() <<
                 "µs" << std::endl;
             lastTime = thisTime;
@@ -51,10 +51,10 @@ int main(int argc, char *argv[]) {
 
         int x = atoi(argv[1]);
         if (x >= 0) {
-            shmObj().val(x);
+            shmObj->val(x);
         } else {
             // Stop on negative argv[1]
-            shmObj().stop();
+            shmObj->stop();
         }
     }
     return 0;
